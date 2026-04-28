@@ -1,0 +1,7 @@
+id=sv_apixaml
+name=AIDLPixelAudioModLibrary
+version=v0.9
+versionCode=100
+author=ShadoV90, anonymix007
+description=This module allow Pixels with AIDL audio effects use JamesDSP and (potentially) Viper4Android
+
