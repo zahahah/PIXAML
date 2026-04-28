@@ -1,0 +1,5 @@
+allow audioserver default_android_service service_manager find
+
+allow { hal_camera_default hal_face_default hal_audio_default hal_neuralnetworks_darwinn modem_ml_svc_sit mediacodec_google mediacodec mediacodec_samsung zygote} system_file file { read open getattr map execute }
+
+allow { hal_camera_default hal_face_default hal_audio_default hal_neuralnetworks_darwinn modem_ml_svc_sit mediacodec_google mediacodec mediacodec_samsung zygote } vendor_file file { read open getattr map execute }
