@@ -1,0 +1,10 @@
+# Local credentials, diagnostics, and generated files
+.env
+.env.*
+!.env.example
+AGENTS.md
+.omx/
+/dist/
+/diagnostics/
+__pycache__/
+*.py[cod]

@@ -1,0 +1,19 @@
+# PIXAML frozen AIDL compatibility payload
+# Generated from immutable AOSP AIDL API snapshots. These libraries retain
+# their real SONAMEs; no newer V4/V5 library is renamed as V2/V3.
+
+android.hardware.audio.effect version=2 hash=54d5a2e1d59066b57e35eb7bcb5ebc72a1259c1c
+android.hardware.audio.common version=3 hash=57ce9506b87e721f0d994b16d7cd16a494f699b9
+android.media.audio.common.types version=3 hash=0c86a38729dd5d560fe3a0eca6aa9d8cf83efb00
+android.hardware.common version=2 hash=c32ddfdeb69c6e4a8a45519e6f9a39c4b66fd99f
+android.hardware.common.fmq version=1 hash=12cf0ce8614557cc0efe73bdf011f5193f7a8653
+
+android.hardware.audio.effect-V2-ndk.so sha256=665982cb368fcd15b8aad5a3a31f79fd89bc7eded79fac6cb6a3e1303a8be190
+android.hardware.audio.common-V3-ndk.so sha256=ad5e918bb9ac6b40474b0c7b575b39e9254431a2f8d250962e070b989cc9e33c
+android.media.audio.common.types-V3-ndk.so sha256=6bc927c58c168eb8d1d2d96d6d0d9c163827114ad970b84eeead0bb65e0eb387
+
+hardware_interfaces_commit=1a56e38edc2f2f6189ef405ee1edce554e15cbc0
+system_hardware_interfaces_commit=1b82105349a8af0824ad03f15b0b964dea62e031
+frameworks_native_commit=4f463a6b1de9198963dc6aff74154a504ba3f8f6
+aidl_tool=Android_SDK_build-tools_36.1.0
+ndk_toolchain=28.2.13676358_clang_19.0.1

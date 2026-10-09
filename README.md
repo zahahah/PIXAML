@@ -1,33 +1,71 @@
-# PIXAML
+# PIXAML — Android 17 AIDL audio module
 
-**Project Status: Unmaintained** *Due to a lack of free time, I have decided to stop the development of this module. Feel free to fork the repository and continue this work.*
+This repository contains a staged, fail-safe correction of
+AIDLPixelAudioModLibrary v0.9 for KernelSU Next and Magic Mount-rs v4.0.10.
+The validated target is Pixel 10 Pro XL (`mustang`) on Android 17
+`CP2A.260705.006`.
 
-## Overview
+Authors: **lightningzahah, ShadoV90, anonymix007**.
 
-PIXAML is an audio modification module designed specifically for the **Google Pixel 8 and newer devices** in the Pixel family. 
+## Current package: v0.9.6-rc1 service diagnostics
 
-In these newer devices, the sound effect architecture has been migrated from HIDL to AIDL. 
-This migration removed the `audio_effects_config.xml` file, so audio effects like JamesDSP, Viper4Android, etc. cannot patch it. 
+This is a diagnostic candidate, not a validated release. On the last available
+device capture the service exited before publishing `IFactory/aml`; the new
+status includes the child exit code to make the next authorized test more
+diagnostic. It does not claim to fix that startup failure.
 
-## How It Works
+The source packages the AML service with a module-private empty
+configuration at `config/audio_effects_config.xml`. It no longer overlays that
+file onto `/vendor/etc/audio_effects_config.xml`, and it still does not restart
+audio processes automatically.
 
-To bypass this limitation, PIXAML performs the following operations:
-1. **Patches `libaudiohal@aidl.so`**: It modifies `/system/lib64/libaudiohal@aidl.so` to utilize an additional service (`vendor.aml.effect-service`).
-2. **Restores Configuration**: It adds the missing `audio_effects_config.xml` file back into `/vendor/etc`.
+Stage A proved that Magic Mount-rs mounts `/vendor` correctly when
+`system/vendor` is a real directory. Stage B then proved the corrected module
+layout and found the next blocker: Android 17 does not provide
+`android.hardware.audio.effect-V2-ndk.so` under the SONAME required by the
+prebuilt service.
 
-The binary modification is handled by `patchelf`, a tool specifically designed for this type of operation. 
+Stage C added reproducibly generated frozen AIDL V2/V3 compatibility libraries
+under the private `/vendor/lib64/pixaml` directory and starts the AML service
+only after a successful post-mount linker check using that same private search
+path. It does not replace same-named libraries for unrelated vendor processes.
 
-*Note: The source code for the service binary used in this project can be found here: [vendor_aml_effects by anonymix007](https://github.com/anonymix007/vendor_aml_effects).*
+Safety properties:
 
-## ⚠️ WARNING: Bootloop Risk & Troubleshooting
+- `system/vendor` is a real directory, never `system/vendor -> ../vendor`.
+- `customize.sh` locally disables KernelSU's generic partition rewrite.
+- `late-load.sh` supports KernelSU Next late-load/Jailbreak Mode.
+- `post-fs-data.sh` and `late-load.sh` perform pre-mount validation only.
+- `post-mount.sh` verifies the mounted payload and resolves the service's
+  dynamic dependencies without executing its main function.
+- The service path does not restart the firmware audio HAL or audioserver in
+  either mode. `audio-reload.sh` is a no-op compatibility entry point. This
+  contains the restart risk; it does not establish JamesDSP playback.
+- The empty AML XML is module-private and is not mounted over the firmware
+  `/vendor/etc/audio_effects_config.xml`.
+- The old automatic patchelf, dependency-renaming, policy, and integration
+  scripts are quarantined under `research/legacy/` and excluded from release.
 
-***!!! THERE IS A RISK OF A BOOTLOOP !!!*** *Always be prepared for a bootloop just in case. Have a recovery method ready before flashing.*
+The prebuilt `aml.so` hook is stored under `staging/hook/`, outside the mount
+tree. `libaudiohal@aidl.so` is neither generated nor included. The installer
+and pre-mount gate both reject an automatically mountable copy.
 
-**Known Conflicts:**
-Some Magisk/KernelSU modules can conflict with PIXAML, even if they seemingly have nothing in common (e.g., *PixelXpert*). 
+The framework continues using `IFactory/default`; the module does **not**
+redirect it to `IFactory/aml`. Registering `IFactory/aml` does not prove that
+the framework discovered, created, or applied JamesDSP.
 
-**Troubleshooting Steps if Your Device Doesn't Boot:**
-1. Disable **all** modules (including non-audio ones).
-2. Enable **only PIXAML** and reboot to check if the system boots successfully.
-3. If it boots, begin enabling your other modules one by one. 
-*(For unknown reasons, establishing PIXAML as the first enabled module often resolves conflicts).*
+Build and test:
+
+~~~sh
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v
+PYTHONDONTWRITEBYTECODE=1 python3 tools/package_stage_c.py
+~~~
+
+Rebuild the frozen AIDL payload when auditing its provenance:
+
+~~~sh
+ANDROID_SDK_ROOT=/path/to/sdk tools/build_aidl_compat.sh
+~~~
+
+Do not deploy a ZIP until the device failure and installed module versions are
+identified. See `docs/STAGE_C_SERVICE.md` for the current diagnostic boundary.
