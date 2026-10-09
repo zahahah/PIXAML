@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the deterministic Stage C service-diagnostics candidate."""
+"""Build the deterministic PIXAML v0.9.6 module ZIP."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ import zipfile
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUTPUT_DIR = ROOT / "dist"
-ZIP_PATH = OUTPUT_DIR / "AIDLPixelAudioModLibrary-v0.9.6-rc1-service-diagnostics.zip"
+ZIP_PATH = OUTPUT_DIR / "AIDLPixelAudioModLibrary-v0.9.6.zip"
 FIXED_TIME = (2020, 1, 1, 0, 0, 0)
 
 PAYLOADS = {

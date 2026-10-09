@@ -267,7 +267,7 @@ handle_partition vendor
     def test_release_archive_has_exact_safe_allowlist(self) -> None:
         packager = load_packager()
         props = (ROOT / "module.prop").read_text()
-        self.assertIn("version=v0.9.6-rc1-service-diagnostics", props)
+        self.assertIn("version=v0.9.6", props)
         self.assertIn("versionCode=106", props)
         with tempfile.TemporaryDirectory() as tmp:
             output = pathlib.Path(tmp) / "module.zip"

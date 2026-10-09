@@ -7,12 +7,13 @@ The validated target is Pixel 10 Pro XL (`mustang`) on Android 17
 
 Authors: **lightningzahah, ShadoV90, anonymix007**.
 
-## Current package: v0.9.6-rc1 service diagnostics
+## Stable release: v0.9.6
 
-This is a diagnostic candidate, not a validated release. On the last available
-device capture the service exited before publishing `IFactory/aml`; the new
-status includes the child exit code to make the next authorized test more
-diagnostic. It does not claim to fix that startup failure.
+The maintainer reports stable use alongside JamesDSP on a Pixel 10 Pro XL
+(`mustang`) running Android 17 with KernelSU Next and Magic Mount-rs. Results
+may vary by device, firmware, and root mode. Please report defects through
+GitHub Issues with device/build details, root mode, relevant logs, and steps
+to reproduce.
 
 The source packages the AML service with a module-private empty
 configuration at `config/audio_effects_config.xml`. It no longer overlays that
@@ -39,8 +40,7 @@ Safety properties:
 - `post-mount.sh` verifies the mounted payload and resolves the service's
   dynamic dependencies without executing its main function.
 - The service path does not restart the firmware audio HAL or audioserver in
-  either mode. `audio-reload.sh` is a no-op compatibility entry point. This
-  contains the restart risk; it does not establish JamesDSP playback.
+  either mode. `audio-reload.sh` is a no-op compatibility entry point.
 - The empty AML XML is module-private and is not mounted over the firmware
   `/vendor/etc/audio_effects_config.xml`.
 - The old automatic patchelf, dependency-renaming, policy, and integration
@@ -67,5 +67,6 @@ Rebuild the frozen AIDL payload when auditing its provenance:
 ANDROID_SDK_ROOT=/path/to/sdk tools/build_aidl_compat.sh
 ~~~
 
-Do not deploy a ZIP until the device failure and installed module versions are
-identified. See `docs/STAGE_C_SERVICE.md` for the current diagnostic boundary.
+The host tests verify archive contents and safety guards, but do not replace
+device-specific validation. See `docs/STAGE_C_SERVICE.md` for service and
+linker details.
