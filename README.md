@@ -9,7 +9,7 @@ Authors: **lightningzahah, ShadoV90, anonymix007**.
 
 ## Stable release: v0.9.6
 
-The maintainer reports stable use alongside JamesDSP on a Pixel 10 Pro XL
+Tested environment: Stable use alongside JamesDSP on a Pixel 10 Pro XL
 (`mustang`) running Android 17 with KernelSU Next and Magic Mount-rs. Results
 may vary by device, firmware, and root mode. Please report defects through
 GitHub Issues with device/build details, root mode, relevant logs, and steps
