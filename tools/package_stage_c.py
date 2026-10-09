@@ -52,7 +52,7 @@ def main() -> None:
     digest = build()
     checksum = ZIP_PATH.with_suffix(ZIP_PATH.suffix + ".sha256")
     checksum.write_text(
-        f"{digest}  {ZIP_PATH.relative_to(ROOT).as_posix()}\n", encoding="ascii"
+        f"{digest}  {ZIP_PATH.name}\n", encoding="ascii"
     )
     print(ZIP_PATH.relative_to(ROOT))
     print(f"SHA256 {digest}")
