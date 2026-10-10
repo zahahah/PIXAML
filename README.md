@@ -3,18 +3,21 @@
 PIXAML keeps the Audio Modification Library path useful on modern Pixel
 firmware without taking ownership of the whole audio stack. This tree carries a
 careful AIDLPixelAudioModLibrary v0.9 update for KernelSU Next and Magic
-Mount-rs v4.0.10. The validated target is Pixel 10 Pro XL (`mustang`) on
+Mount-rs v4.0.11. The validated target is Pixel 10 Pro XL (`mustang`) on
 Android 17 `CP2A.260705.006`.
 
 Authors: **lightningzahah, ShadoV90, anonymix007**.
 
 ## Stable release: v0.9.6
 
-Tested environment: stable daily use with JamesDSP on a Pixel 10 Pro XL
-(`mustang`) running Android 17 with KernelSU Next and Magic Mount-rs. This is
-still vendor audio work, so results can change with firmware, root stage, and
-module mix. Please report defects through GitHub Issues with device/build
-information, root mode, useful logs, and clear reproduction steps.
+PIXAML is an optional companion to JamesDSP, not a requirement for it. On the
+tested Pixel 10 Pro XL (`mustang`), JamesDSP also worked without PIXAML because
+it uses Android's default effect factory. PIXAML provides a separate AML
+service for setups that need AML-specific compatibility or other AML-based
+effects. Whether that is useful depends on the device and the rest of the audio
+stack. Results can change with firmware, root stage, and module mix; please
+report defects through GitHub Issues with device/build details, root mode,
+useful logs, and clear reproduction steps.
 
 The module ships the AML service with a module-private empty configuration at
 `config/audio_effects_config.xml`. It does not overlay that file onto
@@ -55,9 +58,11 @@ pre-mount gate both reject an automatically mountable copy because this build
 keeps the hook path off by design.
 
 The framework still uses `IFactory/default`; PIXAML does **not** redirect it to
-`IFactory/aml`. Seeing `IFactory/aml` registered only proves that the standalone
-AML service came up. It does not prove that JamesDSP was discovered, created,
-enabled, or heard in the audio path.
+`IFactory/aml`. JamesDSP can be loaded through the default factory without
+PIXAML on the tested Pixel. On other devices, PIXAML may be useful when the
+audio setup specifically needs its AML service, but registering `IFactory/aml`
+does not by itself make AudioFlinger use that factory. It also does not prove
+that JamesDSP was discovered, created, enabled, or heard in the audio path.
 
 Build and test:
 
