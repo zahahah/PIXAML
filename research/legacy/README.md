@@ -1,10 +1,10 @@
 # Quarantined v0.9 implementation
 
-These files are preserved only for audit and diff review. They are renamed
-with `.disabled`, live outside the module root hooks, and are not included by
-`tools/package_stage_b.py`.
+These files stay here for audit and diff review. They are renamed with
+`.disabled`, live outside active module hooks, and are not packaged by
+`tools/package_stage_c.py`.
 
-They must not be restored to active paths without separate validation:
+Do not restore them to active paths without a separate validation plan:
 
 - `patch.sh` copied and patched `libaudiohal@aidl.so` during installation and
   every standard post-fs-data boot;
@@ -16,5 +16,6 @@ They must not be restored to active paths without separate validation:
 - `sepolicy.rule` granted broad execute/map access unrelated to the minimum
   AML service policy.
 
-Stage B intentionally replaces none of those behaviors. The prebuilt ELF
-payloads are byte-identical and all compatibility decisions remain pending.
+The current PIXAML path keeps those behaviors out of release builds. The
+prebuilt ELF payloads remain byte-identical; every compatibility decision is
+kept explicit so the module stays understandable and reversible.

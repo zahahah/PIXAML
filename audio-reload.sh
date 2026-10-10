@@ -1,8 +1,8 @@
 #!/system/bin/sh
 
-# Retained as a safe compatibility entry point for existing installations.
-# Restarting the default audio HAL from a module can trigger init recovery and
-# is not a validated way to make late-loaded effects visible to the framework.
+# Keep this compatibility entry point, but do not touch global audio state.
+# A module-side HAL/audioserver restart is not a validated way to refresh
+# late-loaded effects on this firmware.
 MODDIR=${0%/*}
 STATE_DIR=${PIXAML_STATE_DIR:-"$MODDIR/state"}
 mkdir -p "$STATE_DIR"

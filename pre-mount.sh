@@ -9,8 +9,8 @@ mkdir -p "$STATE_DIR"
 
 block_mount() {
   printf 'BLOCKED stage=%s reason=%s\n' "$STAGE" "$1" >"$STATUS"
-  # KernelSU metamodules recognize skip_mount. Failing closed prevents an
-  # accidental critical system library or invalid vendor layout from mounting.
+  # KernelSU metamodules honor skip_mount. Fail closed so an unexpected
+  # critical audio hook or invalid vendor layout never gets mounted.
   touch "$MODDIR/skip_mount"
   exit 1
 }

@@ -1,4 +1,4 @@
-"""Host-only safety, ABI, and packaging tests for the Stage C module."""
+"""Host-only safety, ABI, and packaging tests for the PIXAML module."""
 
 from __future__ import annotations
 

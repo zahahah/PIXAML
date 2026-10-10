@@ -3,5 +3,5 @@ name=AIDLPixelAudioModLibrary
 version=v0.9.6
 versionCode=106
 author=lightningzahah, ShadoV90, anonymix007
-description=PIXAML AIDL AML service; private config, no vendor audio effects overlay, no audio restart, hook disabled.
+description=PIXAML standalone AML service with private config, no vendor XML overlay, no audio restart, and hook disabled.
 

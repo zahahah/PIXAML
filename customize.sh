@@ -1,7 +1,6 @@
-# This file is sourced by the KernelSU/Magisk installer after normal ZIP
-# extraction. Keep system/vendor as the real module directory: the generic
-# KernelSU handler would otherwise move it to vendor/ and create the layout
-# that Magic Mount-rs v4.0.10 rejects.
+# The KernelSU/Magisk installer sources this after extracting the ZIP. Keep
+# system/vendor as the real module directory; the generic KernelSU handler
+# would move it to vendor/ and create the layout Magic Mount-rs rejects.
 handle_partition() {
   return 0
 }
@@ -14,7 +13,7 @@ fail_install() {
   exit 1
 }
 
-ui_print "- Installing standalone AML service validation"
+ui_print "- Installing PIXAML standalone AML service"
 
 [ -d "$MODPATH/system/vendor" ] || \
   fail_install "! Missing real system/vendor directory"
@@ -73,12 +72,12 @@ mkdir -p "$MODPATH/state"
 chmod 0700 "$MODPATH/state"
 chown 0:0 "$MODPATH/state"
 
-# An earlier fail-closed validation may have left this marker behind. A fresh
-# successful installation must not inherit that stale decision.
+# Clear a stale fail-closed marker from an earlier attempt. A clean install
+# should make its own mount decision.
 rm -f "$MODPATH/skip_mount"
 
 ui_print "- system/vendor preserved as a real directory"
-ui_print "- Frozen AIDL V2/V3 compatibility libraries installed systemlessly"
-ui_print "- Standalone AML service autostart is enabled with private config"
-ui_print "- Late-load never restarts the firmware audio HAL or audioserver"
+ui_print "- Frozen AIDL V2/V3 libraries installed systemlessly"
+ui_print "- Standalone AML service uses module-private config"
+ui_print "- Late-load keeps firmware audio HAL/audioserver untouched"
 ui_print "- libaudiohal@aidl.so is not generated or mounted"

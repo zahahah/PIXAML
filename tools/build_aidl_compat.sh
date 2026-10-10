@@ -1,5 +1,5 @@
 #!/bin/sh
-# Rebuild the three frozen AIDL NDK compatibility libraries used by Stage C.
+# Rebuild the three frozen AIDL NDK compatibility libraries used by PIXAML.
 # Inputs are pinned AOSP API snapshots; no Pixel firmware binary is modified.
 set -eu
 
@@ -93,8 +93,8 @@ generate fmq1 1 "$SRC/fmq1"
 generate audio_common3 3 "$SRC/audio_common3"
 generate effect2 2 "$SRC/effect2" 31
 
-# Android platform C++ uses std::__1. The NDK intentionally uses std::__ndk1,
-# so build against a temporary header copy with the platform ABI namespace.
+# Android platform C++ uses std::__1. The NDK uses std::__ndk1, so build
+# against a temporary header copy with the platform ABI namespace.
 cp -R "$PREBUILT/sysroot/usr/include/c++/v1" "$WORK/libcxx-headers"
 python3 - "$WORK/libcxx-headers/__config_site" <<'PY'
 import pathlib
@@ -108,7 +108,7 @@ if old not in text:
 path.write_text(text.replace(old, "#define _LIBCPP_ABI_NAMESPACE __1"))
 PY
 
-# A SONAME-only link stub records the real Android platform dependency
+# A SONAME-only link stub records the real Android platform dependency,
 # libc++.so. The stub itself is not shipped.
 cat >"$WORK/libcxx_stub.cpp" <<'EOF'
 extern "C" void pixaml_libcxx_link_stub() {}

@@ -1,6 +1,6 @@
-# PIXAML frozen AIDL compatibility payload
-# Generated from immutable AOSP AIDL API snapshots. These libraries retain
-# their real SONAMEs; no newer V4/V5 library is renamed as V2/V3.
+# PIXAML frozen AIDL compatibility payload.
+# Generated from immutable AOSP AIDL API snapshots. These libraries keep their
+# real SONAMEs; no newer V4/V5 library is renamed as V2/V3.
 
 android.hardware.audio.effect version=2 hash=54d5a2e1d59066b57e35eb7bcb5ebc72a1259c1c
 android.hardware.audio.common version=3 hash=57ce9506b87e721f0d994b16d7cd16a494f699b9

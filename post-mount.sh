@@ -41,8 +41,8 @@ ls -lZ "$MOUNTED_SERVICE" "$PRIVATE_CONFIG" \
   "$COMPAT_DIR/android.media.audio.common.types-V3-ndk.so" \
   >"$STATE_DIR/mounted-contexts.txt" 2>&1
 
-# --list resolves the executable's DT_NEEDED closure without running its main
-# function or registering a Binder service. A failure keeps autostart blocked.
+# --list resolves DT_NEEDED without entering the service main function or
+# registering Binder. If it fails, keep autostart blocked.
 if ! LD_LIBRARY_PATH="$COMPAT_DIR" \
   /system/bin/linker64 --list "$MOUNTED_SERVICE" \
   >"$STATE_DIR/linker-list.txt" 2>&1; then

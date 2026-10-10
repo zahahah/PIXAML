@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify the frozen AIDL payload against the unmodified AML service ELF."""
+"""Verify the frozen AIDL payload against the unchanged AML service ELF."""
 
 from __future__ import annotations
 

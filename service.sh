@@ -84,8 +84,8 @@ done
 printf 'BLOCKED reason=binder_registration_timeout pid=%s inspect=%s\n' \
   "$pid" "$LOG" >"$STATUS"
 
-# Fail closed: a process that did not publish its Binder endpoint must not be
-# left resident. This is a single best-effort SIGTERM, never a restart loop.
+# Fail closed: if the process did not publish its Binder endpoint, do not
+# leave it running. Send one best-effort SIGTERM; never loop or restart.
 if kill -0 "$pid" 2>/dev/null; then
   kill "$pid" 2>/dev/null || :
 fi

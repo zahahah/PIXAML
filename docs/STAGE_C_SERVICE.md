@@ -1,7 +1,7 @@
-# Stage C/D — standalone AML service; automatic audio restart disabled
+# Stage C/D — standalone AML service; audio restart disabled
 
-Stage C is the first runnable service build. It is deliberately **not yet the
-native audio hook release**: `libaudiohal@aidl.so` remains absent and
+Stage C is the first build that starts the standalone AML service. It is not a
+native audio hook release: `libaudiohal@aidl.so` remains absent and
 `staging/hook/aml.so` remains outside `system/`.
 
 ## Why the Stage B linker check failed
@@ -13,16 +13,16 @@ The original prebuilt service is linked against frozen AIDL client libraries:
 * `android.media.audio.common.types-V3-ndk.so`
 
 Android 17 on `mustang` no longer installs the first library under that SONAME.
-Stage C supplies the three exact frozen interfaces, generated from immutable
-AOSP AIDL API snapshots. It does not rename a V4/V5 binary to an older name.
-The source API hashes, AOSP revisions, and binary hashes are recorded in
-`compat-manifest.txt`; `tools/build_aidl_compat.sh` is the reproducer.
+Stage C supplies the three exact frozen interfaces generated from immutable AOSP
+AIDL API snapshots. It does not rename a V4/V5 binary to an older name. Source
+API hashes, AOSP revisions, and binary hashes are recorded in
+`compat-manifest.txt`; `tools/build_aidl_compat.sh` reproduces the payload.
 
-The service's 23 unresolved `aidl::android::hardware::audio::effect` symbols
-were checked against the generated V2 library and all 23 are exported. The
-generated libraries use Android platform `std::__1`, depend on `libc++.so`,
-are ARM64 ELF objects, and have 16 KiB segment alignment. A 16 KiB-aligned ELF
-also satisfies the tested 4 KiB kernel page size.
+The service had 23 unresolved `aidl::android::hardware::audio::effect` symbols.
+All 23 are exported by the generated V2 library. The generated libraries use
+Android platform `std::__1`, depend on `libc++.so`, are ARM64 ELF objects, and
+have 16 KiB segment alignment. A 16 KiB-aligned ELF also satisfies the tested 4
+KiB kernel page size.
 
 ## Runtime safety boundary
 
@@ -39,30 +39,29 @@ module-private and is passed as an argument to the AML process:
 ~~~
 
 It does not write physical partitions, patch firmware libraries, load a custom
-SELinux policy, or enable the native hook. The compatibility
-SONAMEs are frozen versions and are not present in the tested firmware under
-the required names. They stay in the private `/vendor/lib64/pixaml` directory
-instead of replacing names in `/vendor/lib64`; only the AML process receives
-that directory through `LD_LIBRARY_PATH`.
+SELinux policy, or enable the native hook. The compatibility SONAMEs are frozen
+versions that are not present in the tested firmware under the required names.
+They stay in private `/vendor/lib64/pixaml`; only the AML process receives that
+directory through `LD_LIBRARY_PATH`.
 
-`post-mount.sh` compares every mounted payload and requires `linker64 --list`,
-with the same private `LD_LIBRARY_PATH` used at launch, to resolve the entire
-dependency closure. Only then does
-`service.sh` launches one instance with the explicit module-private XML path. It waits
-at most 30 seconds for `IFactory/default` and at most 15 seconds to observe
-`IFactory/aml`.
+`post-mount.sh` compares every mounted payload and runs `linker64 --list` with
+the same private `LD_LIBRARY_PATH` used at launch. This resolves the dependency
+closure without entering the service main function. Only after that gate passes,
+`service.sh` starts one AML service instance with the explicit module-private
+XML path. It waits up to 30 seconds for `IFactory/default` and up to 15 seconds
+for `IFactory/aml`.
+
 If Binder registration times out while the child is still alive, the script
-sends that one child a single SIGTERM and does not restart it.
+sends that one child a single SIGTERM. It does not enter a restart loop.
 
-The AML service is intentionally started before the native hook exists. A
-failure therefore cannot redirect the framework away from the original
-`IFactory/default`.
+The AML service starts before any native hook exists. A failure cannot redirect
+the framework away from the original `IFactory/default`.
 
-## Installation (paused)
+## Installation
 
-Use the generated `v0.9.5-private-config` ZIP for this stage. Do not install
-older `v0.9.3-late-load-reload` artifacts as a diagnostic step because they
-contain the automatic restart path.
+Use the generated `v0.9.6` ZIP for this stage. Do not install older
+`v0.9.3-late-load-reload` artifacts as a diagnostic step because they contain
+the automatic audio restart path.
 
 ## Validation
 
@@ -92,9 +91,9 @@ Expected results:
 * no denial involving that process and `service_manager add/find` appears;
 * this module does not overlay `/vendor/etc/audio_effects_config.xml`.
 
-Do not proceed to the native hook if any item differs. In particular,
-`BLOCKED`, `EXITED`, a missing AML Binder service, or an SELinux denial means
-the standalone service has not passed.
+Do not proceed to a native hook if any item differs. `BLOCKED`, `EXITED`, a
+missing AML Binder service, or an SELinux denial means the standalone service
+has not passed.
 
 ## Reversal
 
@@ -105,25 +104,25 @@ usable, use the established AshReXcue mechanism to create:
 /data/adb/modules/sv_apixaml/disable
 ~~~
 
-No physical `/system` or `/vendor` restoration is needed because every mount
-is temporary and every persistent module file is under `/data/adb/modules`.
+No physical `/system` or `/vendor` restoration is needed because every mount is
+temporary and every persistent module file is under `/data/adb/modules`.
 
 ## Late-load / Jailbreak Mode
 
-`late-load.sh` performs only the source-tree preflight before the metamodule
-mount. The shared `post-mount.sh` linker gate and `service.sh` registration
-gate run afterward. The service is never started from the pre-mount hook.
+`late-load.sh` performs only source-tree preflight before the metamodule mount.
+The shared `post-mount.sh` linker gate and `service.sh` registration gate run
+afterward. The service is never started from the pre-mount hook.
 
 At this point the firmware `IFactory/default` may already have cached the old
 configuration. The previous automatic HAL/audioserver restart was not proven
-safe on this firmware and is disabled in the working tree. `audio-reload.sh`
-only records `SKIPPED reason=unsafe_audio_restart_disabled`; `service.sh` does
-not call it or gate AML registration on its result. This prevents that restart
-path, but does not make the cached factory discover JamesDSP.
+safe on this firmware and is disabled here. `audio-reload.sh` only records
+`SKIPPED reason=unsafe_audio_restart_disabled`; `service.sh` does not call it or
+gate AML registration on its result. This removes that restart path, but it does
+not make the cached factory discover JamesDSP.
 
 ## Remaining boundary
 
-Passing the host tests proves script behavior and packaging. Final device
-acceptance still requires the default factory to list the JamesDSP UUID, an
-effect instance to be created by the app, audible processing, and stable pause,
-resume and route changes over time.
+Passing host tests proves script behavior and packaging. Final device acceptance
+still requires the default factory to list the JamesDSP UUID, the app to create
+and enable an effect instance, audible processing, stable pause/resume and route
+changes, and no relevant AVCs or reboots over time.
